@@ -2,47 +2,47 @@
 
 ### 1. What was the C10k problem, and why was it difficult for traditional web servers?
 
-C10k խնդիրը այն է, երբ սերվերը պետք է միաժամանակ 10 000 client սպասարկի։ Apache-ի նման սերվերները ամեն client-ի համար առանձին thread են բացում։ Այդ thread-երը blocking են երբ մեկը ֆայլ է կարդում, նա կանգնում է և սպասում է, մինչև ֆայլը կարդացվի, ուստի մյուս client-ների համար նոր thread-եր են պետք։ 10 000 thread-ը շատ հիշողություն է ուտում և դանդաղեցնում է համակարգը, մինչդեռ դրանց մեծ մասը պարզապես սպասում է։
+The C10k problem is when a server has to serve 10,000 clients at the same time. Servers like Apache open a separate thread for every client. These threads are blocking: when one is reading a file, it stops and waits until the file has been read, so new threads are needed for the other clients. 10,000 threads consume a lot of memory and slow the system down, even though most of them are just waiting.
 
 ### 2. Who is Ryan Dahl, and what problem inspired him to create Node.js?
 
-Node.js-ը ստեղծել է ամերիկացի ծրագրավորող Ryan Dahl-ը 2009 թվականին։ Նա ուշադրություն դարձրեց Flickr-ի progress bar-ին browser-ը ստիպված էր անընդհատ սերվերին հարցնել, թե ֆայլը որքանով է վերբեռնվել, քանի որ սերվերը չէր կարողանում ինքնուրույն տեղեկացնել առաջընթացի մասին։ Դա նրան հասկացրեց, որ սերվերները պետք է աշխատեն non-blocking և event-driven ձևով  առանց սպասելու և event-ներին արձագանքելով։
+Node.js was created by the American programmer Ryan Dahl in 2009. He noticed the progress bar on Flickr: the browser had to keep asking the server how much of the file had been uploaded, because the server couldn't report the progress by itself. This made him realize that servers should work in a non-blocking and event-driven way, without waiting and by reacting to events.
 
 ### 3. Why did Ryan Dahl choose Google's V8 engine?
 
-Node.js-ը օգտագործում է Google-ի V8 շարժիչը, որը ստեղծվել է Chrome-ի համար 2008 թվականին։ Dahl-ը այն ընտրեց, քանի որ V8-ը շատ արագ էր , open source էր, ուստի Dahl-ին պետք չէր սեփական JavaScript շարժիչ գրել։
+Node.js uses Google's V8 engine, which was created for Chrome in 2008. Dahl chose it because V8 was very fast and open source, so Dahl didn't need to write his own JavaScript engine.
 
 ### 4. What is npm, and when was it introduced?
 
-npm-ը (Node Package Manager) Node.js-ի փաթեթների կառավարիչն է, որը ստեղծվել է 2010 թվականին։ Այն թույլ է տալիս մեկ հրամանով տեղադրել ուրիշ ծրագրավորողների պատրաստի փաթեթները և օգտագործել այն առանց ամեն ինչ զրոյից գրելու։
+npm (Node Package Manager) is the package manager of Node.js, created in 2010. It lets you install ready-made packages by other developers with a single command and use them without writing everything from scratch.
 
 ### 5. How did Node.js change the relationship between frontend and backend development?
 
-Մինչև Node.js-ը frontend-ը և backend-ը երկու առանձին աշխարհ էին frontend-ը գրվում էր JavaScript-ով և աշխատում էր բրաուզերում, իսկ backend-ը այլ լեզուներով : Node.js-ը JavaScript-ը բերեց սերվեր, ուստի հիմա երկու կողմերը կարելի է գրել նույն լեզվով։ Դրա շնորհիվ առաջացավ full-stack JavaScript developer-ի դերը:
+Before Node.js, frontend and backend were two separate worlds: the frontend was written in JavaScript and ran in the browser, while the backend was written in other languages. Node.js brought JavaScript to the server, so now both sides can be written in the same language. Thanks to this, the role of the full-stack JavaScript developer appeared.
 
 ### 6. What is the purpose of the `lib/` directory in the Node.js repository?
 
-`lib/` թղթապանակը Node.js-ի JavaScript շերտն է  , այն պարունակում է այն մոդուլները, որոնք անմիջապես օգտագործում ենք, օրինակ՝ `fs.js`, `http.js`, `net.js`, `stream.js`, `events.js`, `crypto.js` և `path.js`։ Օրինակ՝ `lib/fs.js`-ը ստանում է փոխանցված տվյալները, կատարում է անհրաժեշտ ստուգումները և հետո `internalBinding`-ի միջոցով կանչում է `src/`-ի C++ կոդը։ Այս թղթապանակը հիմնականում գրված է JavaScript-ով։
+The `lib/` directory is the JavaScript layer of Node.js. It contains the modules we use directly, for example `fs.js`, `http.js`, `net.js`, `stream.js`, `events.js`, `crypto.js` and `path.js`. For example, `lib/fs.js` receives the passed data, performs the necessary checks, and then calls the C++ code in `src/` through `internalBinding`. This directory is mainly written in JavaScript.
 
 ### 7. What is the purpose of the `src/` directory?
 
-`src/` թղթապանակը Node.js-ի հիմնական շարժիչն է, որը գրված է C++-ով։ Երբ գործարկվում է `node`-ը, աշխատում է հենց այս կոդը։ Այն իրականացնում է binding-ները, որոնք կամուրջ են `lib/`-ի JavaScript-ի և  միացնում է V8-ը և libuv-ը։ Օրինակ՝ `src/node_file.cc`-ը `fs` մոդուլի հետևում կանգնած C++ կոդն է երբ `lib/fs.js`-ը կանչում է `internalBinding('fs')`, հենց այս ֆայլն է կատարում իրական աշխատանքը։
+The `src/` directory is the core engine of Node.js, written in C++. When `node` is launched, this very code runs. It implements the bindings, which act as a bridge to the JavaScript in `lib/`, and connects V8 and libuv. For example, `src/node_file.cc` is the C++ code behind the `fs` module: when `lib/fs.js` calls `internalBinding('fs')`, this file does the actual work.
 
 ### 8. What is the purpose of the `deps/` directory?
 
-`deps/` թղթապանակը պարունակում է երրորդ կողմի գրադարանները, որոնց վրա Node.js-ը հիմնված է և որոնք նա չի գրել ինքը։ Օրինակ՝ V8-ը JavaScript-ը կատարելու համար, libuv-ը event loop-ի և non-blocking I/O-ի համար, OpenSSL-ը գաղտնագրության: Դրանք հիմնականում գրված են C և C++ լեզուներով։
+The `deps/` directory contains the third-party libraries that Node.js is built on and that it didn't write itself. For example, V8 for executing JavaScript, libuv for the event loop and non-blocking I/O, and OpenSSL for cryptography. They are mostly written in C and C++.
 
 ### 9. What is libuv, and what does it do?
 
-libuv-ը C լեզվով գրված գրադարան է, որը գտնվում է `deps/`-ում և համարվում է Node.js-ի միջուկը։ Այն ապահովում է event loop-ը, non-blocking I/O-ն և ֆայլային համակարգի գործողությունները, ինչպես նաև thread pool-ը այն գործողությունների համար, որոնք չեն կարող ասինխրոն լինել։
+libuv is a library written in C, located in `deps/`, and is considered the heart of Node.js. It provides the event loop, non-blocking I/O and file system operations, as well as the thread pool for operations that cannot be asynchronous.
 
 ### 10. Describe the simplified execution path of `fs.readFile()` in Node.js. What are Deno and non-blocking I/O?
 
-Երբ կանչում եմ `fs.readFile('text.txt')`, `lib/fs.js`-ը նախ ստուգում է արգումենտները, հետո `internalBinding('fs')`-ով փոխանցում է C++ կոդին (`src/`)։ Այնտեղից այն գնում է libuv-ին, որը ֆայլը կարդալու գործը տալիս է thread pool-ի որևէ thread-ի, որ main thread-ը չկանգնի։
+When I call `fs.readFile('text.txt')`, `lib/fs.js` first validates the arguments, then passes them to the C++ code (`src/`) via `internalBinding('fs')`. From there it goes to libuv, which hands the file-reading job to one of the threads in the thread pool so that the main thread doesn't get blocked.
 
-Deno-ն ստեղծել է նույն Ryan Dahl-ը, որովհետև Node.js-ում շատ բանի համար էր ափսոսում, օրինակ՝ անվտանգության համար. Node-ը ֆայլերին և ցանցին հասանելի է առանց թույլտվության։ Deno-ում դրա համար permissions կան։
+Deno was created by the same Ryan Dahl, because he regretted many things about Node.js, for example security: Node has access to files and the network without permission. In Deno there are permissions for that.
 
-Non-blocking I/O նշանակում է, որ ծրագիրը չի սպասում երկար գործողության ավարտին, այլ անցնում է մյուս գործին, իսկ արդյունքը գալիս է հետո։ Օրինակ՝ սրճարանում պատվիրում ես, նստում ես, և երբ սուրճը պատրաստ է, քեզ կանչում են։
+Non-blocking I/O means that the program doesn't wait for a long operation to finish, but moves on to other work, and the result comes later. For example, in a café you place an order, sit down, and when the coffee is ready, they call you.
 
 ## B1 — Environment Setup
 
@@ -95,69 +95,68 @@ Source: [Node.js GitHub — deps directory](https://github.com/nodejs/node/tree/
 
 ## B4 — Node.js GitHub Repository Exploration
 
-### 1. internalBinding('fs')-ը `lib/fs.js` ֆայլում
+### 1. `internalBinding('fs')` in the `lib/fs.js` file
 
-`internalBinding('fs')`-ը Node.js-ի ներքին մեխանիզմ է, որը թույլ է տալիս JavaScript կոդին հասանելիություն ստանալ ֆայլային համակարգի հետ կապված ներքին ֆունկցիոնալությանը։ Այն կապում է `lib/fs.js`-ի JavaScript իրականացումը Node.js-ի ներքին native (C++) իրականացումների հետ։
+`internalBinding('fs')` is an internal Node.js mechanism that allows JavaScript code to access internal file-system functionality. It connects the JavaScript implementation in `lib/fs.js` with Node.js's internal native (C++) implementations.
 
-### 2. `src/node_file.cc` ֆայլի դերը
+### 2. The role of the `src/node_file.cc` file
 
-`src/node_file.cc`-ը Node.js-ի C++ կոդով գրված ֆայլ է, որը պարունակում է File System-ի հետ կապված native իրականացումները։ Այն ապահովում է կապը JavaScript API-ների և օպերացիոն համակարգի, ֆայլային համակարգի հնարավորությունների միջև։
+`src/node_file.cc` is a file written in C++ in Node.js that contains the native implementations related to the File System. It provides the link between the JavaScript APIs and the capabilities of the operating system and file system.
 
-### 3. `deps/` պանակի 5 ենթապանակները և դրանց նշանակությունը
+### 3. The 5 subdirectories of `deps/` and their purpose
 
-`deps/` պանակը պարունակում է Node.js-ի կողմից օգտագործվող արտաքին գրադարանները և dependencies-ները։
+The `deps/` directory contains the external libraries and dependencies used by Node.js.
 
-| Directory | Նշանակություն |
+| Directory | Purpose |
 |---|---|
-| `deps/v8/` | JavaScript Engine է, որը կատարում է JavaScript կոդը։ |
-| `deps/uv/` | libuv գրադարանն է, որը կառավարում է asynchronous I/O գործողությունները և Event Loop-ը։ |
-| `deps/openssl/` | Ապահովում է գաղտնագրման և TLS/SSL ֆունկցիոնալությունը։ |
-| `deps/llhttp/` | Օգտագործվում է HTTP հաղորդագրությունների parsing-ի համար։ |
-| `deps/zlib/` | Ապահովում է տվյալների Compression և Decompression հնարավորությունները։ |
+| `deps/v8/` | The JavaScript engine that executes JavaScript code. |
+| `deps/uv/` | The libuv library, which manages asynchronous I/O operations and the Event Loop. |
+| `deps/openssl/` | Provides encryption and TLS/SSL functionality. |
+| `deps/llhttp/` | Used for parsing HTTP messages. |
+| `deps/zlib/` | Provides data compression and decompression capabilities. |
 
-### 4. `lib/` պանակի 5 JavaScript module
+### 4. 5 JavaScript modules in the `lib/` directory
 
-`lib/` պանակը պարունակում է Node.js-ի ներքին JavaScript մոդուլները, որոնք տրամադրում են տարբեր ֆունկցիոնալություններ։
+The `lib/` directory contains the internal JavaScript modules of Node.js, which provide various functionalities.
 
-| Module | Նշանակություն |
+| Module | Purpose |
 |---|---|
-| `fs.js` | File-երի և directory-ների հետ աշխատանք։ |
-| `path.js` | File-երի և directory-ների path-երի մշակում։ |
-| `http.js` | HTTP սերվերների և հարցումների հետ աշխատանք։ |
-| `os.js` | Օպերացիոն համակարգի մասին տեղեկությունների ստացում։ |
-| `crypto.js` | Կրիպտոգրաֆիկ գործողություններ՝ hash և encryption։ |
-
+| `fs.js` | Working with files and directories. |
+| `path.js` | Handling file and directory paths. |
+| `http.js` | Working with HTTP servers and requests. |
+| `os.js` | Getting information about the operating system. |
+| `crypto.js` | Cryptographic operations: hashing and encryption. |
 
 ## Part C — Event Loop
 
 ### C1 — Predict the Output
 
-1. `console.log('A')` — սինխրոն է, անմիջապես տպվում է։
-2. `setTimeout(..., 0)` — callback-ը տրվում է timer-ին, հետո կմտնի timer queue:։
-3. `Promise.resolve().then(...)` — callback-ը մտնում է microtask queue։
-4. `console.log('D')` — սինխրոն է, անմիջապես տպվում է։
-5. Call stack-ը դատարկվելուց հետո կատարվում է microtask-ը՝ տպվում է `C`։
-6. Վերջում կատարվում է timer callback-ը՝ տպվում է `B`։
+1. `console.log('A')` — synchronous, printed immediately.
+2. `setTimeout(..., 0)` — the callback is handed to the timer, and later enters the timer queue.
+3. `Promise.resolve().then(...)` — the callback enters the microtask queue.
+4. `console.log('D')` — synchronous, printed immediately.
+5. After the call stack is empty, the microtask is executed: `C` is printed.
+6. Finally, the timer callback is executed: `B` is printed.
 
-0 ms-ը նշանակում է որքան հնարավոր է շուտ, ոչ թե հենց հիմա։
+0 ms means "as soon as possible", not "right now".
 
 ### C2 — Blocking the Event Loop
 
-**Արդյունք.**
+**Output:**
 
 ```
 Busy loop finished
 Timer fired after 2000 ms (I asked for 100 ms)
 ```
 
-Timer-ը աշխատում է ոչ թե 100 ms-ից հետո, այլ մոտ 2000 ms-ից հետո, երբ busy loop-ն ավարտվում է։ Node.js-ը JavaScript կոդը կատարում է մեկ main thread-ով։ Քանի դեռ սինխրոն ցիկլը աշխատում է, call stack-ը զբաղված է, և event loop-ը չի կարող անցնել timer queue-ին։ 100 ms-ը միայն նվազագույն սպասումն է, ոչ թե երաշխավորված ժամանակը callback-ը կաշխատի միայն այն ժամանակ, երբ thread-ը ազատվի։ Եթե սերվերի մեջ կա 2 վայրկյան տևող blocking գործողություն, այդ ընթացքում սերվերը չի կարող սպասարկել ոչ մի այլ client-ի. նրանց բոլոր հարցումները սպասում են queue-ում։ Հենց դրա համար է Node.js-ը կառուցված non-blocking I/O-ի վրա. երբ պետք է ֆայլ կարդալ կամ տվյալների բազայից սպասել, այն այդ գործը հանձնում է libuv-ին և անցնում է հաջորդին, որպեսզի մեկ thread-ը կարողանա միաժամանակ սպասարկել շատ օգտատերերի։ Դրա համար Node.js-ում երկար գործողությունները պետք է լինեն asynchronous (non-blocking)։
+The timer fires not after 100 ms, but after about 2000 ms, when the busy loop finishes. Node.js executes JavaScript code on a single main thread. While the synchronous loop is running, the call stack is busy, and the event loop cannot move on to the timer queue. The 100 ms is only the minimum wait, not a guaranteed time: the callback will run only when the thread becomes free. If a server has a blocking operation that lasts 2 seconds, during that time the server cannot serve any other client; all their requests wait in the queue. This is exactly why Node.js is built on non-blocking I/O: when it needs to read a file or wait for a database, it hands that job to libuv and moves on to the next one, so that a single thread can serve many users at the same time. That's why long operations in Node.js must be asynchronous (non-blocking).
 
 ## Bonus — Ryan Dahl's Regrets
 
-1. **Promises-ը չպահեց.** Dahl-ը Promises-ը ավելացրել էր 2009-ի, բայց հանեց, և ինքն էլ դա անվանեց հիմար որոշում։ Արդյունքում Node-ի ասինխրոն API-ները մնացին callback-ների վրա, իսկ Promises-ը անհրաժեշտ է async/await-ի համար։ Նրա կարծիքով, եթե Promises-ը միասնական օգտագործվեին, async/await-ի ստանդարտացումը հնարավոր է արագ լիներ։
-2. **Անվտանգություն.** Node.js ծրագիրը կարող է առանց որևէ թույլտվության կարդալ ֆայլեր, գրել դրանք և օգտագործել ցանցը։ Օրինակ՝ քո linter-ը չպետք է լիարժեք հասանելիություն ունենա քո համակարգչին և ցանցին։
-3. **`node_modules`.** Երբ գրում ենք `require('express')`, Node-ը ճշգրիտ ուղի չգիտի և ստիպված է փնտրել `node_modules` պանակներում՝ մեկ առ մեկ բարձրանալով վերև, մինչև գտնի։ Սա բարդացնում է մոդուլների որոնման ալգորիթմը։ Բրաուզերում և Deno-ում import-ը ուղիղ նշում է ուղին կամ URL-ը, ուստի այդպիսի փնտրտուք պետք չէ։
+1. **Promises were not kept.** Dahl added Promises in 2009 but removed them, and he himself called that a stupid decision. As a result, Node's asynchronous APIs stayed on callbacks, while Promises are required for async/await. In his opinion, if Promises had been used consistently, the standardization of async/await might have happened faster.
+2. **Security.** A Node.js program can read files, write them and use the network without any permission. For example, your linter shouldn't have full access to your computer and network.
+3. **`node_modules`.** When we write `require('express')`, Node doesn't know the exact path and has to search the `node_modules` folders, going up one by one until it finds it. This complicates the module resolution algorithm. In the browser and in Deno, an import specifies the path or URL directly, so no such search is needed.
 
-### Իմ կարծիքը՝ անվտանգության մասին
+### My opinion: about security
 
-Ես համաձայն եմ Dahl-ի հետ, որ սա լուրջ խնդիր է։ Երբ տեղադրում ես npm փաթեթ, դու վստահում ես ոչ միայն դրա հեղինակին, այլ նաև այն բոլոր փաթեթներին, որոնցից այն կախված է։ Եթե նրանցից մեկը վնասակար է, այն կարող է կարդալ քո ֆայլերը կամ ուղարկել տվյալներ ինտերնետով, և Node.js-ը չի կանգնեցնի դա։ Deno-ն այս խնդիրը լուծում է permissions համակարգով. ծրագիրը ֆայլերին կամ ցանցին հասանելիություն ստանում է միայն այն դեպքում, երբ դու այն ուղղակիորեն թույլ ես տալիս։ Իմ կարծիքով սա ավելի ճիշտ մոտեցում է, թեև ավելի անհարմար է, որովհետև ստիպված ես ամեն անգամ թույլտվություններ նշել։
+I agree with Dahl that this is a serious problem. When you install an npm package, you trust not only its author, but also all the packages it depends on. If one of them is malicious, it can read your files or send data over the internet, and Node.js won't stop it. Deno solves this problem with a permissions system: a program gets access to files or the network only when you explicitly allow it. In my opinion this is a better approach, although it is less convenient, because you have to specify permissions every time.
